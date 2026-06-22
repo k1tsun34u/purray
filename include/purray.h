@@ -10,30 +10,16 @@
 #ifndef PURRAY_H
 #define PURRAY_H
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <stdbool.h>
+#include <string.h>
 
 #include "internal/purray_config.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-
-// ============================================================================
-// Generic API (C11 _Generic support)
-// ============================================================================
-
-#ifdef PURRAY_USE_GENERIC
-	/**
-	 * @brief Create a new array with initial capacity.
-	 * @param capacity Initial capacity in elements.
-	 * @param elem_size Size of each element (deduced automatically).
-	 * @return Pointer to the array memory, or NULL on failure.
-	 */
-	#define parray_new(capacity)				\
-		_Generic((capacity), default: purray_alloc(capacity, elem_size))
-#endif // PURRAY_USE_GENERIC
 
 // ============================================================================
 // Constants
@@ -52,7 +38,7 @@ extern "C" {
 
 // Convert header pointer to array memory pointer
 #define PURRAY_HEADER_TO_MEM(header)			\
-	(uintptr_t)((PurrayHeader*)(header) + 1)
+	(void*)((PurrayHeader*)(header) + 1)
 
 // ============================================================================
 // Types
@@ -107,7 +93,7 @@ void *purray_alloc(size_t capacity, size_t elem_size);
  * @param purray_mem Pointer to the array memory.
  * @param new_capacity New capacity in elements.
  * @return Pointer to the reallocated array memory, or `NULL` on failure.
- *         If `NUL`L is returned, the original array remains valid.
+ *		 If `NULL` is returned, the original array remains valid.
  */
 void *purray_realloc(void *purray_mem, size_t new_capacity);
 
@@ -134,7 +120,7 @@ void purray_free(void *purray_mem);
  * @param elem Pointer to the element to place.
  * @param pos Position (index) to place the element at.
  * @return Pointer to the array memory (may change after reallocation),
- *         or `NULL` on failure.
+ *		 or `NULL` on failure.
  */
 void *purray_place(void *purray_mem, const void *elem, size_t pos);
 
@@ -145,7 +131,7 @@ void *purray_place(void *purray_mem, const void *elem, size_t pos);
  * @param count Number of elements to remove.
  * @return Pointer to the array memory, or `NULL` on failure.
  */
-void *purray_remove(void *purray_mem, size_t elem_index, size_t count);
+void *purray_remove(void *purray_mem, size_t pos, size_t count);
 
 // ============================================================================
 // High-level convenience functions (auto-handle reallocation)
@@ -159,10 +145,10 @@ void *purray_remove(void *purray_mem, size_t elem_index, size_t count);
  * @param purray_mem_ptr Pointer to the array pointer.
  * @param new_capacity New capacity in elements.
  * @return Pointer to the resized array, or `NULL` on failure.
- *         On failure, the original array remains valid.
+ *		 On failure, the original array remains valid.
  *
  * @note This function updates the pointer in *purray_mem_ptr
- *       automatically on success.
+ *	   automatically on success.
  */
 void *purray_resize(void **purray_mem_ptr, size_t new_capacity);
 
@@ -172,10 +158,10 @@ void *purray_resize(void **purray_mem_ptr, size_t new_capacity);
  * @param elem Pointer to the element to insert.
  * @param pos Position (index) to insert at.
  * @return Pointer to the array, or `NULL` on failure.
- *         On failure, the original array remains valid.
+ *		 On failure, the original array remains valid.
  *
  * @note This function updates the pointer in *purray_mem_ptr
- *       automatically on success.
+ *	   automatically on success.
  */
 void *purray_insert(void **purray_mem_ptr, const void *elem, size_t pos);
 
@@ -184,10 +170,10 @@ void *purray_insert(void **purray_mem_ptr, const void *elem, size_t pos);
  * @param purray_mem_ptr Pointer to the array pointer.
  * @param elem Pointer to the element to prepend.
  * @return Pointer to the array, or `NULL` on failure.
- *         On failure, the original array remains valid.
+ *		 On failure, the original array remains valid.
  *
  * @note This function updates the pointer in *purray_mem_ptr
- *       automatically on success.
+ *	   automatically on success.
  */
 void *purray_prepend(void **purray_mem_ptr, const void *elem);
 
@@ -196,10 +182,10 @@ void *purray_prepend(void **purray_mem_ptr, const void *elem);
  * @param purray_mem_ptr Pointer to the array pointer.
  * @param elem Pointer to the element to append.
  * @return Pointer to the array, or `NULL` on failure.
- *         On failure, the original array remains valid.
+ *		 On failure, the original array remains valid.
  *
  * @note This function updates the pointer in *purray_mem_ptr
- *       automatically on success.
+ *	   automatically on success.
  */
 void *purray_append(void **purray_mem_ptr, const void *elem);
 
@@ -222,7 +208,7 @@ size_t purray_find(const void *purray_mem, const void *elem, size_t start);
  * @param elem Pointer to the element to find.
  * @param start Starting index for the search (search goes backwards).
  * @return Index of the first matching element (from the end),
- *         or `SIZE_MAX` if not found.
+ *		 or `SIZE_MAX` if not found.
  */
 size_t purray_rfind(const void *purray_mem, const void *elem, size_t start);
 

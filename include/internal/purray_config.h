@@ -40,12 +40,4 @@
 	#error "PURRAY_CAPACITY_GRANULARITY must be a power of 2"
 #endif // PURRAY_CAPACITY_GRANULARITY
 
-// ============================================================================
-// C11 features (_Generic support)
-// ============================================================================
-
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-	#define PURRAY_USE_GENERIC
-#endif // __STDC_VERSION__ >= 201112L
-
 #endif // PURRAY_CONFIG_H
